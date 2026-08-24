@@ -1,6 +1,6 @@
 # Suicide Rates & Socioeconomic Analysis
 
-A data analytics project exploring global suicide rates and socioeconomic indicators using multiple ETL, analytics, machine learning, and visualization technologies.
+A data analytics project exploring global suicide rates and socioeconomic indicators to identify trends, regional disparities, and relationships between socioeconomic factors and suicide rates. The project focuses on data-driven analysis and visualization to support evidence-based insights and decision-making.
 
 ## Architecture
 
