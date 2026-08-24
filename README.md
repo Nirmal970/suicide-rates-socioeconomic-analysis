@@ -1,31 +1,28 @@
 # Suicide Rates & Socioeconomic Analysis
 
-A data analytics project exploring global suicide rates and socioeconomic indicators to identify trends, regional disparities, and relationships between socioeconomic factors and suicide rates. The project focuses on data-driven analysis and visualization to support evidence-based insights and decision-making.
+A data analytics project examining global suicide rates and their relationship with socioeconomic indicators across countries and regions. The project focuses on data preparation, exploratory analysis, analytical SQL, and dashboard-driven insights using Python, Pandas, SQL Server, Power BI, and Tableau.
 
 ## Architecture
 
 ```text
-                  CSV Datasets
-                       │
-             ┌─────────┴─────────┐
-             │                   │
-      Python / Pandas           SSIS
-        Data Processing       Data Processing
-             │                   │
-             └─────────┬─────────┘
-                       │
-                  SQL Server
-                       │
-              Analytical Queries
-                       │
-          ┌────────────┴────────────┐
-          │                         │
-       Power BI                  Tableau
-       Dashboard                 Dashboard
-          │                         │
-          └────────────┬────────────┘
-                       │
-              Business Insights
+                    CSV Datasets
+                         │
+                         ▼
+                  Python / Pandas
+                 Data Preparation
+                         │
+                         ▼
+                 Exploratory Analysis
+                         │
+              ┌──────────┴──────────┐
+              │                     │
+              ▼                     ▼
+        Analytical SQL          Dashboarding
+        SQL Server           Power BI / Tableau
+              │                     │
+              └──────────┬──────────┘
+                         ▼
+                  Business Insights
 ```
 
 Pandas → data cleaning/EDA
@@ -39,7 +36,7 @@ SQL Analysis: Advanced SQL queries for trend analysis, regional comparisons, soc
 
 ## Tech Stack
 
-**Python • Pandas • SSIS • SQL Server • Scikit-learn • TensorFlow • Power BI • Tableau**
+**Python • Pandas • SQL Server • Power BI • Tableau**
 
 ## Power BI Dashboard
 
@@ -53,13 +50,25 @@ SQL Analysis: Advanced SQL queries for trend analysis, regional comparisons, soc
 
 ## Project Components
 
-- **Pandas ETL:** `etl/python/pandas_etl.ipynb`
-- **SSIS ETL:** `etl/ssis/`
+- **Python / Pandas EDA:** `analysis/notebooks/pandas_eda.ipynb`
+- **Python ETL:** `etl/python/pandas_etl.ipynb`
 - **SQL Analysis:** `sql/suicide_analysis.sql`
-- **Predictive & Anomaly Analysis:** `analysis/notebooks/predictive_analysis.ipynb`
-- **Power BI:** `dashboards/powerbi/`
-- **Tableau:** `dashboards/tableau/`
+- **Power BI Dashboard:** `dashboards/powerbi/`
+- **Tableau Dashboard:** `dashboards/tableau/`
+
+## Analytical Questions
+
+The analysis focuses on questions such as:
+
+- How do suicide rates vary across regions and countries?
+- How significant is the difference between male and female suicide rates?
+- Which countries show the highest average age-standardized rates?
+- How do suicide rates vary across different years?
+- What associations exist between suicide rates and socioeconomic indicators such as GDP, GNI, and inflation?
+- Which observations require further investigation due to unusually high rates?
 
 ## Summary
 
-This project demonstrates the end-to-end analytical workflow of cleaning and preparing data with Pandas, querying and analyzing data using SQL Server, exploring socioeconomic relationships through statistical analysis, and communicating findings through Power BI and Tableau dashboards. The analysis focuses on identifying meaningful trends, regional differences, and socioeconomic patterns that can support evidence-based decision-making.
+The project applies Python and Pandas for data preparation and exploratory analysis, SQL for analytical querying and comparative analysis, and Power BI and Tableau for visualization and insight delivery.
+
+The analysis examines regional and country-level differences, gender disparities, temporal patterns, socioeconomic associations, and potential outliers. Findings are interpreted as descriptive and exploratory relationships rather than causal effects.
