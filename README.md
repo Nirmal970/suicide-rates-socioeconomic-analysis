@@ -10,21 +10,32 @@ A data analytics project exploring global suicide rates and socioeconomic indica
              ┌─────────┴─────────┐
              │                   │
       Python / Pandas           SSIS
-           ETL                   ETL
+        Data Processing       Data Processing
              │                   │
              └─────────┬─────────┘
                        │
                   SQL Server
                        │
-               Data Analysis
+              Analytical Queries
                        │
           ┌────────────┴────────────┐
           │                         │
        Power BI                  Tableau
        Dashboard                 Dashboard
+          │                         │
+          └────────────┬────────────┘
+                       │
+              Business Insights
 ```
 
+Pandas → data cleaning/EDA
+SQL → analytical querying
+Statistics → relationships/trends
+Power BI + Tableau → data storytelling
+
 Python was also used for exploratory predictive modeling and anomaly detection using **Scikit-learn and TensorFlow**.
+
+SQL Analysis: Advanced SQL queries for trend analysis, regional comparisons, socioeconomic relationships, and analytical insights.
 
 ## Tech Stack
 
@@ -38,6 +49,8 @@ Python was also used for exploratory predictive modeling and anomaly detection u
 
 ![Tableau Dashboard](images/tableau-dashboard.png)
 
+
+
 ## Project Components
 
 - **Pandas ETL:** `etl/python/pandas_etl.ipynb`
@@ -49,4 +62,4 @@ Python was also used for exploratory predictive modeling and anomaly detection u
 
 ## Summary
 
-This project demonstrates data cleaning and transformation using both **Pandas and SSIS**, analytical querying with **SQL Server**, exploratory machine learning and anomaly detection with **Python**, and data visualization using both **Power BI and Tableau**.
+This project demonstrates the end-to-end analytical workflow of cleaning and preparing data with Pandas, querying and analyzing data using SQL Server, exploring socioeconomic relationships through statistical analysis, and communicating findings through Power BI and Tableau dashboards. The analysis focuses on identifying meaningful trends, regional differences, and socioeconomic patterns that can support evidence-based decision-making.
