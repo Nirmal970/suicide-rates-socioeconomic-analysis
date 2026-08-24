@@ -1,70 +1,116 @@
 -- ============================================================
 -- Suicide Rates & Socioeconomic Factors Analysis
--- SQL Server Analysis Queries
+-- Analytical SQL Queries
 -- ============================================================
 
-USE suicide_analysis;
-GO
 
+-- 1. Regional Suicide Rate Comparison
+-- Compare average age-standardized suicide rates across regions.
 
--- Preview processed datasets
-
-SELECT *
-FROM age_std_suicide_rates_pro;
-
-SELECT *
-FROM suicide_rates_pro;
-
-
--- 1. Average suicide count by region
-
-SELECT
-    RegionName,
-    AVG(SuicideCount) AS AverageSuicideCount
+SELECT RegionName, AVG(DeathRatePer100K) AS AvgDeathRate, COUNT(DISTINCT CountryCode) AS Countries
 FROM age_std_suicide_rates_pro
 GROUP BY RegionName
-ORDER BY AverageSuicideCount DESC;
+ORDER BY AvgDeathRate DESC;
 
 
--- 2. Total suicide count by gender in the United States
+-- 2. Suicide Rate Comparison by Sex
+-- Compare average suicide rates between male and female observations.
 
-SELECT
-    CountryName,
-    Sex,
-    SUM(SuicideCount) AS TotalSuicideCount
+SELECT Sex, AVG(DeathRatePer100K) AS AvgDeathRate, COUNT(*) AS Observations
 FROM age_std_suicide_rates_pro
-WHERE CountryCode = 'USA'
-GROUP BY CountryName, CountryCode, Sex;
+GROUP BY Sex
+ORDER BY AvgDeathRate DESC;
 
 
--- 3. Highest total inflation rate by country in 2001
+-- 3. Top 10 Countries by Average Suicide Rate
+-- Identify countries with higher average rates with at least 5 years of data.
 
-SELECT TOP 1
-    CountryName,
-    SUM(InflationRate) AS TotalInflationRate
+SELECT TOP 10 CountryCode, CountryName, RegionName, AVG(DeathRatePer100K) AS AvgDeathRate, COUNT(DISTINCT Year) AS YearsObserved
 FROM age_std_suicide_rates_pro
-WHERE Year = 2001
-GROUP BY CountryName
-ORDER BY TotalInflationRate DESC;
+GROUP BY CountryCode, CountryName, RegionName
+HAVING COUNT(DISTINCT Year) >= 5
+ORDER BY AvgDeathRate DESC;
 
 
--- 4. Age group with the highest suicide count in Europe
+-- 4. Year-over-Year Change
+-- Calculate annual changes using LAG().
 
-SELECT TOP 1
-    AgeGroup,
-    SUM(SuicideCount) AS TotalSuicideCount
-FROM suicide_rates_pro
-WHERE RegionName = 'Europe'
-GROUP BY AgeGroup
-ORDER BY TotalSuicideCount DESC;
+WITH CountryYear AS (
+    SELECT CountryCode, CountryName, Year, AVG(DeathRatePer100K) AS AvgDeathRate
+    FROM age_std_suicide_rates_pro
+    GROUP BY CountryCode, CountryName, Year
+)
+SELECT CountryCode, CountryName, Year, AvgDeathRate,
+       LAG(AvgDeathRate) OVER (PARTITION BY CountryCode ORDER BY Year) AS PreviousYearRate,
+       AvgDeathRate - LAG(AvgDeathRate) OVER (PARTITION BY CountryCode ORDER BY Year) AS YoYChange
+FROM CountryYear
+ORDER BY CountryName, Year;
 
 
--- 5. Country with the lowest GDP per capita value in 2011
+-- 5. Largest Year-over-Year Increases
+-- Identify country-years with the largest increases.
 
-SELECT TOP 1
-    CountryName,
-    SUM(GDPPerCapita) AS GDPPerCapita
-FROM suicide_rates_pro
-WHERE Year = 2011
-GROUP BY CountryName
-ORDER BY GDPPerCapita ASC;
+WITH CountryYear AS (
+    SELECT CountryCode, CountryName, Year, AVG(DeathRatePer100K) AS AvgDeathRate
+    FROM age_std_suicide_rates_pro
+    GROUP BY CountryCode, CountryName, Year
+),
+RateChanges AS (
+    SELECT CountryCode, CountryName, Year, AvgDeathRate,
+           LAG(AvgDeathRate) OVER (PARTITION BY CountryCode ORDER BY Year) AS PreviousYearRate
+    FROM CountryYear
+)
+SELECT TOP 10 CountryName, Year, PreviousYearRate, AvgDeathRate,
+       AvgDeathRate - PreviousYearRate AS YoYIncrease
+FROM RateChanges
+WHERE PreviousYearRate IS NOT NULL
+ORDER BY YoYIncrease DESC;
+
+
+-- 6. Country Ranking Within Each Region
+-- Rank countries by average suicide rate within their region.
+
+WITH CountryRates AS (
+    SELECT CountryCode, CountryName, RegionName, AVG(DeathRatePer100K) AS AvgDeathRate
+    FROM age_std_suicide_rates_pro
+    GROUP BY CountryCode, CountryName, RegionName
+)
+SELECT CountryName, RegionName, AvgDeathRate,
+       DENSE_RANK() OVER (PARTITION BY RegionName ORDER BY AvgDeathRate DESC) AS RegionalRank
+FROM CountryRates
+ORDER BY RegionName, RegionalRank;
+
+
+-- 7. Regional Socioeconomic Comparison
+-- Compare suicide rates with key socioeconomic indicators.
+
+SELECT RegionName, AVG(DeathRatePer100K) AS AvgDeathRate,
+       AVG(GDPPerCapita) AS AvgGDPPerCapita,
+       AVG(GNIPerCapita) AS AvgGNIPerCapita,
+       AVG(InflationRate) AS AvgInflationRate
+FROM age_std_suicide_rates_pro
+GROUP BY RegionName
+ORDER BY AvgDeathRate DESC;
+
+
+-- 8. Male-Female Rate Gap by Country
+-- Identify countries with the largest male-to-female rate disparity.
+
+WITH GenderRates AS (
+    SELECT CountryCode, CountryName, Sex, AVG(DeathRatePer100K) AS AvgRate
+    FROM age_std_suicide_rates_pro
+    GROUP BY CountryCode, CountryName, Sex
+),
+GenderPivot AS (
+    SELECT CountryCode, CountryName,
+           MAX(CASE WHEN Sex = 'Male' THEN AvgRate END) AS MaleRate,
+           MAX(CASE WHEN Sex = 'Female' THEN AvgRate END) AS FemaleRate
+    FROM GenderRates
+    GROUP BY CountryCode, CountryName
+)
+SELECT TOP 10 CountryName, MaleRate, FemaleRate,
+       MaleRate - FemaleRate AS GenderGap,
+       MaleRate / NULLIF(FemaleRate, 0) AS MaleFemaleRatio
+FROM GenderPivot
+WHERE MaleRate IS NOT NULL AND FemaleRate IS NOT NULL
+ORDER BY MaleFemaleRatio DESC;
